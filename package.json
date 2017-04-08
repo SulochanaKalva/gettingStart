@@ -26,10 +26,12 @@
     "react-addons-test-utils": "^0.14.7",
     "sass-loader": "^6.0.3",
     "style-loader": "^0.13.2",
+    "url-loader": "^0.5.8",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
     "babel-preset-stage-1": "^6.1.18",
     "chart.js": "^1.1.1",
     "lodash": "^3.10.1",
@@ -39,7 +41,11 @@
     "react-chartjs": "^0.8.0",
     "react-d3-basic": "^1.6.11",
     "react-dom": "^0.14.8",
-    "react-dropdown": "^1.2.0",
-    "react-router": "^2.0.1"
+    "react-dropdown": "^1.2.1",
+    "react-redux": "^5.0.3",
+    "react-router": "^2.0.1",
+    "react-widgets": "^3.4.6",
+    "redux": "^3.6.0",
+    "redux-saga": "^0.14.3"
   }
 }

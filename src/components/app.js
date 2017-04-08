@@ -1,20 +1,26 @@
-import React, { Component } from 'react';
-import CustomDropdown from './custom_dropdown';
-require("./../scss/main.scss");
-require("./../scss/app.scss");
-// create component
-export default class App extends Component {
-  render() {
-    var items= [
-         { value: 'three', label: 'Three' },
-         { value: 'four', label: 'Four' }
-       ]
-    return (
-      <div className='example'>
-      	<h1> React Hello World </h1>
-        <CustomDropdown options={items}  placeholder="Select an option" />
-        <div className='hello'> hello sulo u got it </div>
-      </div>
-    );
-  }
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { addTodo } from './../actions/addElement';
+import Trail from './trail'
+
+class App extends Component {
+   render() {
+      const { dispatch, visibleTodos } = this.props;
+
+      return (
+         <div>
+         <button onClick={() => dispatch(addTodo("hello"))}> add </button>
+          hello
+          <Trail/>
+         </div>
+      )
+   }
 }
+
+function select(state) {
+   return {
+      visibleTodos: state.elemts
+   }
+}
+
+export default connect(select)(App)

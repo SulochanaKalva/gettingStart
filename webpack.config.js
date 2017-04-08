@@ -1,8 +1,8 @@
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
-  entry: [
-    './src/index.js'
-  ],
+  entry: {
+    js: ['babel-polyfill', './src/index1.js']
+  },
   output: {
     path: __dirname,
     publicPath: '/',
@@ -17,7 +17,8 @@ module.exports = {
       }
     },{
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('css!sass')
+        loader: ExtractTextPlugin.extract('css!sass?includePaths[]=/src/scss')
+
     }]
   },
   resolve: {

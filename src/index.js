@@ -1,8 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+require("babel-polyfill");
+import React from 'react'
+import { render } from 'react-dom'
+import { createStore, applyMiddleware  } from 'redux'
+import { Provider } from 'react-redux'
+import createSagaMiddleware from 'redux-saga'
+import { watchForLoadImages } from './sagas/sagas'
 
-//Create a new component. Component always produce some HTML
-import App from './components/app';
+import App from './components/app'
+import todoApp from './reducers/reducer'
+const sagaMiddleware = createSagaMiddleware()
+let store = createStore(todoApp,applyMiddleware(sagaMiddleware));
+sagaMiddleware.run(watchForLoadImages);
 
-//Place the component on the index.html page
-ReactDOM.render( <App />, document.querySelector('.container'));
+let rootElement = document.getElementById('hello')
+
+render(
+
+   <Provider store = {store}>
+      <App />
+   </Provider>,
+
+   rootElement
+)
