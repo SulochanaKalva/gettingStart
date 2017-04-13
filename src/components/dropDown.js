@@ -5,7 +5,7 @@ class DropDown extends Component {
     super(props);
     this.state={
       isOpen:false,
-      selectedValue :{label :"Please Select", value:"0"}
+      selectedValue : this.props.placeholder ? {label : this.props.placeholder , value:"0"} : this.props.value
     }
     this.itemClickHandler = this.itemClickHandler.bind(this);
     this.itemKeyupHandler = this.itemKeyupHandler.bind(this);
@@ -15,36 +15,60 @@ class DropDown extends Component {
       return (
 
       <div ref='_dropDown' className="dropdown-main-container">
-          <div className="dropdown-container" ref="_dropDownContainer" tabIndex={0} onKeyDown={event => this.keyDownHandler(event)} onClick={event =>this.clickHandler(event)}>
+          <div className={(this.props.disable ? "dropdown-disabled" : "")+" dropdown-container"} ref="_dropDownContainer" tabIndex={this.props.disable ? -1 : 0} onKeyDown={event => this.onKeyDownHandler(event)} onClick={event =>this.onClickHandler(event)}>
             <div  className='dropdown-selected'>{this.state.selectedValue.label}</div>
             <span className='dropdown-arrow'>{this.state.isOpen ? "d" : "u" }</span>
           </div>
-          <ul ref="_dropDownContent" className={(this.state.isOpen ? "dropdown-content-show" : "dropdown-content-hide") +" dropdown-content"}>
-              {this.optionElements}
-          </ul>
+          <div className={(this.state.isOpen ? "dropdown-content-show" : "dropdown-content-hide") +" dropdown-content"}>
+              <ul ref="_dropDownContent" className="dropdown-list">
+                  {this.renderOptions()}
+              </ul>
+          </div>
       </div>
 
       )
    }
-   clickHandler(event){
-     this.setState({isOpen : !this.state.isOpen});
-   }
-   keyDownHandler(event){
-     if(event.keyCode == 13){
-       this.setState({isOpen : !this.state.isOpen});
+   onClickHandler(event){
+     if(this.state.isOpen){
+       this.closeDropDown();
      }
-     else if(event.keyCode == 40){
+     else{
+       this.openDropDown();
+     }
+   }
+   closeDropDown(){
+     this.setState({isOpen:false});
+     for(var i=0 ;i<this.optionsLength;i++){
+       this.optionsDomElements[i].classList.remove("dropdown-element-focused");
+     }
+     this.refs._dropDownContainer.focus();
+   }
+   openDropDown(){
+     this.setState({isOpen:true});
+   }
+   onKeyDownHandler(event){
+     if(event.key === "Enter" ){
+       this.clickHandler();
+     }
+     else if(event.key === "ArrowDown"){
        if(this.state.isOpen){
            this.optionsDomElements[0].focus();
+           this.optionsDomElements[0].classList.add("dropdown-element-focused");
         }
     }
-    else if(event.keyCode ==9){
+    else if(event.key ==='Tab'){
       this.blurHandler(event);
+    }
+    else if(event.key === "Escape"){
+      if(this.state.isOpen){
+        this.closeDropDown();
+        this.refs._dropDownContainer.focus();
+      }
     }
    }
 
    blurHandler(event){
-     this.setState({isOpen : false});
+     this.closeDropDown();
      console.log(this.state.selectedValue);
    }
    documentClickHandler(event){
@@ -57,61 +81,86 @@ class DropDown extends Component {
    componentDidMount(){
      if(this.optionsLength>0){
          this.optionsDomElements = document.getElementsByClassName("dropdown-element");
-         for(var i=0; i<this.optionsDomElements.length;i++){
-           this.optionsDomElements[i].addEventListener("click",this.itemClickHandler);
-           this.optionsDomElements[i].addEventListener("keydown",this.itemKeyupHandler);
-         }
-     }
+        }
 
      document.addEventListener("click",this.documentClickHandler);
    }
-   componentWillMount(){
-       if(this.props.options.length >0){
-         this.options = this.props.options;
-         this.optionsLength = this.props.options.length;
-         this.optionElements = this.options.map((item, index) =>{
-           return(<li className="dropdown-element"  tabIndex={-1} data-label={item.label} data-value={item.value} key={index}>{item.label} </li>);
-         })
-       }
+   renderOptions(){
+     if(this.props.options.length >0){
+       this.options = this.props.options;
+       this.optionsLength = this.props.options.length;
+       this.optionElements = this.options.map((item, index) =>{
+         if(this.state.selectedValue.value === item.value){
+           if(item.disable){
+              return(<li className="dropdown-element dropdown-element-selected disaable"  tabIndex={-1} onClick={event => this.itemClickHandler(event)} onKeyDown={event => this.itemKeyupHandler(event)} data-label={item.label} data-value={item.value} key={index}>{item.label} </li>)
+           }
+           else{
+             return(<li className="dropdown-element dropdown-element-selected"  tabIndex={-1} onClick={event => this.itemClickHandler(event)} onKeyDown={event => this.itemKeyupHandler(event)} data-label={item.label} data-value={item.value} key={index}>{item.label} </li>)
+           }
+         }
+         else{
+           if(item.disable){
+              return(<li className="dropdown-element disable"  tabIndex={-1} onClick={event => this.itemClickHandler(event)} onKeyDown={event => this.itemKeyupHandler(event)} data-label={item.label} data-value={item.value} key={index}>{item.label} </li>)
+           }
+           else{
+             return(<li className="dropdown-element"  tabIndex={-1} onClick={event => this.itemClickHandler(event)} onKeyDown={event => this.itemKeyupHandler(event)} data-label={item.label} data-value={item.value} key={index}>{item.label} </li>);
+           }
+         }
+       })
+       return this.optionElements;
+     }
    }
    itemClickHandler(event){
-     var selctedItem ={
-       label:event.target.getAttribute("data-label"),
-       value:event.target.getAttribute("data-value")
+     var selctedItem={}
+     if(!event.target.classList.contains("disable")){
+      selctedItem  ={
+         label:event.target.getAttribute("data-label"),
+         value:event.target.getAttribute("data-value")
+       }
      }
-     this.setState({selectedValue:selctedItem , isOpen :false});
-     this.refs._dropDownContainer.focus();
+     else{
+       selctedItem = this.state.selectedValue;
+     }
+     this.setState({selectedValue:selctedItem});
+     this.closeDropDown();
    }
    itemKeyupHandler(event){
-     if(event.keyCode==13){
+     if(event.key==="Enter"){
        this.itemClickHandler(event);
      }
-     else if(event.keyCode == 40 || event.keyCode==38){
+     else if(event.key === "ArrowDown" || event.key ==="ArrowUp"){
        event.target.setAttribute("tabIndex",'-1');
-          if(event.keyCode == 40){
+       event.target.classList.remove('dropdown-element-focused');
+          if(event.key === "ArrowDown"){
             if(event.target.nextElementSibling != null){
               event.target.nextElementSibling.setAttribute("tabIndex","0");
+              event.target.nextElementSibling.classList.add("dropdown-element-focused");
               event.target.nextElementSibling.focus();
             }
             else{
               this.optionsDomElements[0].setAttribute("tabIndex","0");
+              this.optionsDomElements[0].classList.add("dropdown-element-focused");
               this.optionsDomElements[0].focus();
             }
           }
           else{
             if(event.target.previousElementSibling != null){
               event.target.previousElementSibling.setAttribute("tabIndex","0");
+              event.target.previousElementSibling.classList.add("dropdown-element-focused");
               event.target.previousElementSibling.focus();
             }
             else{
               this.optionsDomElements[this.optionsLength-1].setAttribute("tabIndex","0");
+              this.optionsDomElements[this.optionsLength-1].classList.add("dropdown-element-focused");
               this.optionsDomElements[this.optionsLength-1].focus();
             }
           }
      }
-     else if(event.keyCode == 9){
+     else if(event.key === "Tab"){
        this.blurHandler(event);
-
+     }
+     else if(event.key === "Escape"){
+       this.closeDropDown();
      }
    }
 

@@ -12,7 +12,7 @@ class App extends Component {
 
    render() {
      var options =[
-       {label :"First Element", value:"1"},
+       {label :"First Element", value:"1" ,disable:true},
        {label :"Second Element", value:"2"},
        {label :"Third Element", value:"3"},
        {label :"Fourth Element", value:"4"},
@@ -20,7 +20,7 @@ class App extends Component {
      ]
       return (
           <div>
-              <DropDown options={options}/>
+              <DropDown options={options} placeholder="Please Select" disable={false}/>
           </div>
       )
    }
