@@ -16,7 +16,7 @@ let rootElement = document.getElementById('hello')
 
 render(
 
-   <Provider store = {store}>
+   <Provider store = {store}  >
       <App />
    </Provider>,
 
